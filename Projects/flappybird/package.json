@@ -1,0 +1,14 @@
+{
+  "name": "flappybird",
+  "version": "1.0.0",
+  "description": "A flappy bird clone because why not?",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kara Leary",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.8.11"
+  }
+}
