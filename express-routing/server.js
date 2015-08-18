@@ -10,11 +10,12 @@ var router = express.Router({
 });
 
 // Apply routes to application
-app.use('/', router);
+app.use(/^\/([nswe]+)/, router);
 
 
 // Routes
 router.get('/plot', function(req, res, next) {
+  console.log(req.params[0]);
   res.send('Plotting journey');
 });
 
