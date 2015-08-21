@@ -12,11 +12,24 @@ var router = express.Router({
 // Apply routes to application
 app.use(/^\/([nswe]+)/, router);
 
+var directions = {
+  'n': 'north',
+  's': 'south',
+  'w': 'west',
+  'e': 'east'
+}
 
 // Routes
 router.get('/plot', function(req, res, next) {
-  console.log(req.params[0]);
-  res.send('Plotting journey');
+
+  var journey = req.params[0].split('');
+  var journeyLong = [];
+
+  for (var i=0; i<journey.length; i++) {
+    journeyLong.push(directions[journey[i]]);
+  }
+
+  res.send('You plan to travel ' + journeyLong.join(', then '));
 });
 
 
