@@ -6,6 +6,10 @@ var names = require('./names.json');
 var app = express();
 app.use(require('body-parser')());
 
+function choose(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
 app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname + "/form.html"));
 });
@@ -13,13 +17,10 @@ app.get('/', function(req, res) {
 app.post('/', function(req, res) {
     var genre = req.body.genre;
 
-    var nameStart = Math.floor(Math.random() * 3);
-    var nameEnd = Math.floor(Math.random() * 3);
-
-    var bandName = [
-            names[genre].part_1[nameStart],
-            names[genre].part_2[nameEnd]
-        ].join(' ');
+    var bandName= [
+        choose(names[genre].part_1),
+        choose(names[genre].part_2)
+    ].join(' ')
 
     res.send(bandName);
 });
