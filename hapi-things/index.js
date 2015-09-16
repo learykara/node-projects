@@ -1,16 +1,24 @@
 var Hapi = require('hapi');
 var Good = require('good');
 
-var server = new Hapi.Server();
-server.connection({ port: 8080 });
+var quotes = require('./quotes.json');
 
-var HAPPY_QUOTE = "Happiness can exist only in acceptance. -George Orwell";
+var server = new Hapi.Server();
+server.connection({
+  host: 'localhost',
+  port: 8080
+});
+
+function choose(array) {
+  return array[Math.floor(Math.random() * array.length)];
+}
 
 server.route({
   method: 'GET',
   path: '/happy/quote',
   handler: function(request, reply) {
-    reply(HAPPY_QUOTE);
+    var quote = choose(quotes);
+    reply('"' + quote.quote + '"  -' + quote.author);
   }
 });
 
