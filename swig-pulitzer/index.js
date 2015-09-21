@@ -11,14 +11,12 @@ app.set('views', __dirname + '/views');
 app.use(bodyParser.urlencoded());
 
 app.get('/', function (req, res) {
-  res.render('index');
+  res.render('input');
 });
 
 app.post('/', function (req, res) {
-  console.log('Form (from querystring): ' + req.query.form);
-  console.log('Form fields (body): ' + req.body);
-  res.redirect(303, '/next');
-})
+  res.render('output', req.body);
+});
 
 app.listen(8080);
 console.log('Listening on 8080...');
