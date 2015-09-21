@@ -5,51 +5,12 @@
 <form action="/" class="pure-form pure-form-stacked" method="POST" role="form">
     <fieldset>
         <div class="pure-g">
+            {% for item in formItems %}
             <div class="pure-u-1-3">
-                <label for="female_name">A female name</label>
-                <input type="text" id="female_name" name="female_name">
+                <label for="{{ item.identifier }}">{{ item.display }}</label>
+                <input type="text" id="{{ item.identifier }}" name="{{ item.identifier }}">
             </div>
-
-            <div class="pure-u-1-3">
-                <label for="dirty_task">A dirty task</label>
-                <input type="text" id="dirty_task" name="dirty_task">
-            </div>
-
-            <div class="pure-u-1-3">
-                <label for="obnoxious_celebrity">An obnoxious celebrity</label>
-                <input type="text" id="obnoxious_celebrity" name="obnoxious_celebrity">
-            </div>
-
-            <div class="pure-u-1-3">
-                <label for="job_title">A job title</label>
-                <input type="text" id="job_title" name="job_title">
-            </div>
-
-            <div class="pure-u-1-3">
-                <label for="celebrity">A celebrity</label>
-                <input type="text" id="celebrity" name="celebrity">
-            </div>
-
-            <div class="pure-u-1-3">
-                <label for="huge_number">A huge number</label>
-                <input type="text" id="huge_number" name="huge_number">
-            </div>
-
-            <div class="pure-u-1-3">
-                <label for="tedious_task">A tedious task</label>
-                <input type="text" id="tedious_task" name="tedious_task">
-            </div>
-
-            <div class="pure-u-1-3">
-                <label for="useless_skill">A useless skill</label>
-                <input type="text" id="useless_skill" name="useless_skill">
-            </div>
-
-            <div class="pure-u-1-3">
-                <label for="adjective">An adjective</label>
-                <input type="text" id="adjective" name="adjective">
-            </div>
-
+            {% endfor %}
             <button class="pure-button pure-button-primary" type="submit">Submit</button>
         </div>
     </fieldset>
