@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const bodyParser = require('body-parser');
 const express = require('express');
 
@@ -9,11 +10,40 @@ class Storage {
     this.id = 0;
   }
 
-  add(name) {
-    const item = {name: name, id: this.id};
+  add(name, id=null) {
+    if (!id) {
+      id = this.id;
+      this.id += 1;
+    }
+    const item = {name: name, id: id};
     this.items.push(item);
-    this.id += 1;
     return item;
+  }
+
+  delete(id) {
+    this.items = this.items.filter(item => item.id !== id);
+  }
+
+  find(id) {
+    return _.find(this.items, {id: id});
+  }
+
+  update(name, id) {
+    this.items = this.items.map(item => {
+      if (item.id === id) {
+        item.name = name;
+      }
+      return item;
+    });
+  }
+
+  upsert(name, id) {
+    const toUpdate = this.find(id);
+    if (!toUpdate) {
+      this.add(name, id);
+    } else {
+      this.update(name, id);
+    }
   }
 }
 
@@ -31,11 +61,23 @@ app.get('/items', (req, res) => {
 
 app.post('/items', jsonParser, (req, res) => {
   if (!req.body) {
-    return res.sentStatus(400);
+    return res.sendStatus(400);
   }
 
   const item = storage.add(req.body.name);
   res.status(201).json(item);
-})
+});
+
+app.delete('/items/:id', (req, res) => {
+  storage.delete(parseInt(req.params.id));
+  return res.sendStatus(204);
+});
+
+app.put('/items/:id', jsonParser, (req, res) => {
+  if (!req.body) {
+    return res.sendStatus(400);
+  }
+  storage.upsert(req.body.name, parseInt(req.body.id));
+});
 
 app.listen(process.env.PORT || 8080);
