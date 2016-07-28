@@ -11,7 +11,7 @@ class Storage {
       id = this.id;
       this.id += 1;
     }
-    const item = {name: name, id: id};
+    let item = {name: name, id: id};
     this.items.push(item);
     return item;
   }
@@ -31,16 +31,19 @@ class Storage {
       }
       return item;
     });
+    return _.find(this.items, {id: id});
   }
 
   upsert(name, id) {
     const toUpdate = this.find(id);
+    let item;
     if (!toUpdate) {
-      this.add(name, id);
+      item = this.add(name, id);
     } else {
-      this.update(name, id);
+      item = this.update(name, id);
     }
+    return item;
   }
 }
 
-module.exports = Storage;
+exports.Storage = Storage;
