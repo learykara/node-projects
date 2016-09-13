@@ -15,7 +15,14 @@ const THIRD_ITEM = 'Peppers'
 chai.use(chaiHttp)
 
 describe('Shopping list', () => {
-  before((done) => {
+
+  // Nested `describe`s
+  // describe('on get', () => {
+  //   it('should list items on get')
+  //   it('should get a 404 if item does not exist')
+  // })
+
+  beforeEach((done) => {
     runServer(() => {
       Item.create(
         { name: FIRST_ITEM },
@@ -26,7 +33,7 @@ describe('Shopping list', () => {
     })
   })
 
-  after((done) => {
+  afterEach((done) => {
     Item.remove(() => done())
   })
 
@@ -72,8 +79,6 @@ describe('Shopping list', () => {
           item.should.be.a('object')
           item.should.have.property('_id')
           item.should.have.property('name')
-          // Why would this be failing?
-          // item._id.should.be.a('string')
           item.name.should.be.a('string')
           item.name.should.equal('Kale')
           done()
@@ -97,17 +102,14 @@ describe('Shopping list', () => {
           res.body._id.should.be.a('string')
           res.body.name.should.equal('New item')
 
-          // Why would this be failing?
-          // Item.count({}, (countErr, count) => {
-          //   chai.expect(count).to.equal(3)
-          // })
+          Item.count({}, (countErr, count) => {
+            chai.expect(count).to.equal(3)
+          })
 
           Item.findById(item._id, (err, newItem) => {
             newItem.should.be.a('object')
             newItem.should.have.property('_id')
             newItem.should.have.property('name')
-            // Why would this be failing?
-            // newItem._id.should.be.a('string')
             newItem.name.should.be.a('string')
             newItem.name.should.equal('New item')
             done()
