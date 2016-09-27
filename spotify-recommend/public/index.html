@@ -83,13 +83,14 @@ li {
 
         <script>
 var Spotify = function() {
-    this.searchButton = $('button');
-    this.searchButton.click(this.onSearchClicked.bind(this));
+    this.searchForm = $('.pure-form');
+    this.searchForm.submit(this.onSearchSubmitted.bind(this));
     this.searchBox = $('input');
     this.result = $('#result');
     this.artistTemplate = Handlebars.compile($("#artist-template").html());
 };
-Spotify.prototype.onSearchClicked = function() {
+Spotify.prototype.onSearchSubmitted = function(event) {
+    event.preventDefault();
     var name = this.searchBox.val();
     this.search(name);
     this.result.toggleClass('transparent');
@@ -114,7 +115,7 @@ $(document).ready(function() {
     <body>
         <form class="pure-form">
             <input type="text">
-            <button type="button" class="pure-button pure-button-primary">Find Related Artists</button>
+            <button type="submit" class="pure-button pure-button-primary">Find Related Artists</button>
         </form>
         <div id="result">
         </div>
