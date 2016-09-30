@@ -8,7 +8,7 @@ const app = express()
 app.use(express.static('public'))
 
 const getFromApi = (endpoint, args) => {
-  const emitter = new EventEmitter()
+  let emitter = new EventEmitter()
   unirest.
     get(`https://api.spotify.com/v1/${endpoint}`).
     qs(args).
@@ -18,45 +18,40 @@ const getFromApi = (endpoint, args) => {
       : emitter.emit('error', response.code)
     })
 
-    return emitter
+  return emitter
 }
 
-function getTopTracks(artistId, cb) {
-  getFromApi(
-    `artists/${artistId}/top-tracks`, {country: 'US'}).
-  on('end', (response) => {
-    cb(null, response.tracks)
-  }).
-  on('error', (code) => {
-    cb(code)
-  })
-}
-
-const onGetRelatedComplete = (relatedArtists) => {
-  const newEmitter = new EventEmitter()
+const getTopTracks = (relatedArtists) => {
+  let emitter = new EventEmitter()
   let fetched = 0
 
   const checkComplete = () => {
     if (fetched === relatedArtists.length) {
       // Yey you're done! Now do something about it.
-      newEmitter.emit('end', relatedArtists)
+      console.log('Finished fetching all top tracks')
+      emitter.emit('end', relatedArtists)
     }
   }
 
   relatedArtists.forEach((relatedArtist) => {
-    getTopTracks(relatedArtist.id, (err, tracks) => {
-      if (err) {
-        console.error(err)
-      }
-      else {
-        relatedArtist.tracks = tracks
-      }
-      fetched += 1
-      checkComplete()
-    })
+    console.log(`Getting top tracks for ${relatedArtist.id}`)
+    getFromApi(
+        `artists/${relatedArtist.id}/top-tracks`, { country: 'US' })
+      .on('end', (response) => {
+        console.log('Success')
+        relatedArtist.tracks = response.tracks
+        fetched += 1
+        checkComplete()
+      })
+      .on('error', (code) => {
+        console.error(`Error fetching tracks for artist ${relatedArtist.id}`)
+        relatedArtist.tracks = []
+        fetched += 1
+        checkComplete()
+      })
   })
 
-  return newEmitter
+  return emitter
 }
 
 app.get('/search/:name', (req, res) => {
@@ -66,8 +61,8 @@ app.get('/search/:name', (req, res) => {
     type: 'artist',
   })
 
-  searchReq.on('end', (item) => {
-    const artist = item.artists.items[0]
+  searchReq.on('end', (searchResp) => {
+    const artist = searchResp.artists.items[0]
 
     if (!artist) {
       return res.sendStatus(404)
@@ -75,20 +70,24 @@ app.get('/search/:name', (req, res) => {
 
     const artistId = artist.id
 
-    getFromApi(`artists/${artistId}/related-artists`, {
-      limit: 5,
-    }).on('end', (item2) => {
-      const artists = item2.artists
-      artist.related = artists
+    const relatedReq = getFromApi(`artists/${artistId}/related-artists`, {
+      limit: 5
+    })
 
-      const newSearchReq = onGetRelatedComplete(artist.related)
-      newSearchReq.on('end', relatedArtists => {
+    relatedReq.on('end', (relatedResp) => {
+      console.log('Finished getting related artists.')
+      const artists = relatedResp.artists
+
+      getTopTracks(artists).on('end' , relatedArtists => {
         artist.related = relatedArtists
         res.json(artist)
       })
-    }).on('error', (code) => {
+    })
+
+    relatedReq.on('error', (code) => {
       res.sendStatus(404)
     })
+
   })
 
   searchReq.on('error', (code) => {
